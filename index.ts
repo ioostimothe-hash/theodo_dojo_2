@@ -4,62 +4,72 @@ function handlePreFlightRequest(): Response {
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Headers": "content-type",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     },
   });
 }
 
 async function handler(_req: Request): Promise<Response> {
-  if (_req.method == "OPTIONS") {
-    handlePreFlightRequest();
+  if (_req.method === "OPTIONS") {
+    return handlePreFlightRequest();
   }
 
-  const headers = new Headers();
-  headers.append("Content-Type", "application/json");
+  const url = new URL(_req.url);
+  const word = url.searchParams.get("word");
+
+  const corsHeaders = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "content-type",
+  };
+
+  if (!word || !word.trim()) {
+    return new Response(
+      JSON.stringify({ error: "Missing word parameter in URL" }),
+      { status: 400, headers: corsHeaders },
+    );
+  }
 
   const similarityRequestBody = JSON.stringify({
-    word1: "centrale",
+    word1: word.trim(),
     word2: "supelec",
   });
 
-  const requestOptions = {
-    method: "POST",
-    headers: headers,
-    body: similarityRequestBody,
-    redirect: "follow",
-  };
-
   try {
-    const response = await fetch(
-      "https://word2vec-ten.vercel.app/similarity",
-      requestOptions,
-    );
-
-    if (!response.ok) {
-      console.error(`Error: ${response.statusText}`);
-      return new Response(`Error: ${response.statusText}`, {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Headers": "content-type",
-        },
-      });
-    }
-
-    const result = await response.json();
-
-    console.log(result);
-    return new Response(JSON.stringify(result), {
-      status: 200,
+    const response = await fetch("https://word2vec-ten.vercel.app/similarity", {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "content-type",
       },
+      body: similarityRequestBody,
+      redirect: "follow",
+    });
+
+    const result = await response.text();
+
+    if (!response.ok) {
+      console.error("API error:", response.status, result);
+
+      return new Response(
+        JSON.stringify({
+          error: "Similarity API error",
+          details: result,
+        }),
+        { status: response.status, headers: corsHeaders },
+      );
+    }
+
+    return new Response(result, {
+      status: 200,
+      headers: corsHeaders,
     });
   } catch (error) {
     console.error("Fetch error:", error);
-    return new Response(`Error: ${error.message}`, { status: 500 });
+
+    return new Response(
+      JSON.stringify({ error: "Failed to contact similarity API" }),
+      { status: 500, headers: corsHeaders },
+    );
   }
 }
 
