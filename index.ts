@@ -30,7 +30,7 @@ async function handler(_req: Request): Promise<Response> {
 
   try {
     const response = await fetch(
-      "https://word2vec-ten.vercel.app/similarity/",
+      "https://word2vec-ten.vercel.app/similarity",
       requestOptions,
     );
 
