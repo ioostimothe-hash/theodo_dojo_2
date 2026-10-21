@@ -12,17 +12,54 @@
   p-button {
     display: flex;
     justify-content: center;
-    margin-bottom: 15%
+    margin-bottom: 15%;
   }
 
-  input, label, p-progressBar {
+  input,
+  label,
+  p-progressBar {
     margin-bottom: 5%;
   }
 
-
   ::ng-deep {
     .p-progressbar-label {
-      display:none
+      display: none;
     }
   }
+}
+
+.container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form input {
+  flex: 1;
+  min-width: 0;
+}
+
+.score {
+  margin: 1.5rem 0;
+}
+
+.score-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: #777;
 }

@@ -1,21 +1,42 @@
 <div class="container">
   <div class="form">
     <label>Guess my word :</label>
-    <input pInputText type="text" [(ngModel)]="myGuess"/>
+    <input
+      pInputText
+      type="text"
+      [(ngModel)]="myGuess"
+      (keyup.enter)="sendMyGuess()"
+    />
   </div>
-  <p-button (click)="sendMyGuess()">Send</p-button>
-  <p-progressBar [value]="myResultDistance" [style]="{ height: '10px' }" />
-  @if (hasError){
-    <label>Mot inconnu... 🫠</label>
-  } @else if (myResultDistance < 20){
-    <label>T'es loin là ! 🥶</label>
-  } @else if (myResultDistance < 50) {
-    <label>Mouais... 🥱</label>
-  } @else if (myResultDistance < 75) {
-    <label>Tu tiens un truc ! 😳</label>
-  } @else if (myResultDistance < 100) {
-    <label>Si proche du but ! 🔥</label>
-  } @else {
-    <label>Félicitations ! 🎉</label>
+
+  <p-button (onClick)="sendMyGuess()" label="Send" />
+
+  <div class="score">
+    <div class="score-label">
+      <span>Score de similarité</span>
+      <strong>{{ myResultDistance | number: "1.2-3" }}</strong>
+    </div>
+
+    <p-progressBar [value]="scorePercentage" [style]="{ height: '10px' }" />
+    <div class="scale">
+      <span>0</span>
+      <span>0,5</span>
+      <span>1</span>
+    </div>
+  </div>
+  @if (hasError) {
+    <label>Mot inconnu ou erreur API... 🫠</label>
+  } @else if (hasResult) {
+    @if (myResultDistance < 0.2) {
+      <label>T'es loin là ! 🥶</label>
+    } @else if (myResultDistance < 0.5) {
+      <label>Mouais... 🥱</label>
+    } @else if (myResultDistance < 0.75) {
+      <label>Tu tiens un truc ! 😳</label>
+    } @else if (myResultDistance < 1) {
+      <label>Si proche du but ! 🔥</label>
+    } @else {
+      <label>Félicitations ! 🎉</label>
+    }
   }
 </div>
