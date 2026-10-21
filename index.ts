@@ -13,25 +13,23 @@ async function handler(_req: Request): Promise<Response> {
   if (_req.method === "OPTIONS") {
     return handlePreFlightRequest();
   }
-
-  const url = new URL(_req.url);
-  const word = url.searchParams.get("word");
-
   const corsHeaders = {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "content-type",
   };
+  const url = new URL(_req.url);
+  const word = url.searchParams.get("word")?.trim().toLowerCase();
 
-  if (!word || !word.trim()) {
-    return new Response(
-      JSON.stringify({ error: "Missing word parameter in URL" }),
-      { status: 400, headers: corsHeaders },
-    );
+  if (!word) {
+    return new Response(JSON.stringify({ error: "Mot manquant" }), {
+      status: 400,
+      headers: corsHeaders,
+    });
   }
 
   const similarityRequestBody = JSON.stringify({
-    word1: word.trim(),
+    word1: word,
     word2: "supelec",
   });
 
